@@ -26,3 +26,9 @@ class RegistrationForm(forms.Form):
         if User.objects.filter(username=username).exists():
             raise ValidationError("Username already exists")
         return username
+
+
+class loginForm(forms.Form):
+    username = forms.CharField(max_length=150, required=True)
+    password = forms.CharField(widget=forms.PasswordInput(), required=True)
+    

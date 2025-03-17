@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --background-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --input-focus: #eef2ff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --error-color: #ef4444;
+            --success-color: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 2rem 2rem 1.5rem;
+        }
+
+        h2 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-content {
+            padding: 0 2rem 2rem;
+        }
+
+        .profile-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .profile-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-value {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background-color: var(--card-bg);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--input-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 0.875rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .edit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .edit-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        .save-btn {
+            background-color: var(--primary-color);
+            color: white;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .save-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        .cancel-btn {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+        .cancel-btn:hover {
+            background-color: rgba(99, 102, 241, 0.05);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .main-btn {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            margin-top: 1rem;
+        }
+
+        .main-btn:hover {
+            background-color: rgba(99, 102, 241, 0.05);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: auto;
+            padding: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .notification {
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Your Profile</h2>
+            <p class="subtitle">View and edit your personal information</p>
+        </div>
+
+        <!-- View Mode -->
+        <div id="view-mode" class="profile-content">
+            <div class="notification success" id="success-message">
+                Profile updated successfully!
+            </div>
+            
+            <div class="profile-group">
+                <label class="profile-label">Name</label>
+                <div class="profile-value" id="name-display">John Doe</div>
+            </div>
+            
+            <div class="profile-group">
+                <label class="profile-label">Phone Number</label>
+                <div class="profile-value" id="phone-display">123-456-7890</div>
+            </div>
+            
+            <div class="profile-group">
+                <label class="profile-label">Password</label>
+                <div class="profile-value">••••••••</div>
+            </div>
+            
+            <button class="edit-btn" id="edit-button">Edit Profile</button>
+            <button class="main-btn" onclick="window.location.href='/main'">Go to Main Page</button>
+        </div>
+
+        <!-- Edit Mode -->
+        <div id="edit-mode" class="profile-content hidden">
+            <div class="profile-group">
+                <label for="name-input" class="profile-label">Name</label>
+                <input type="text" id="name-input" placeholder="Enter your name">
+            </div>
+            
+            <div class="profile-group">
+                <label for="phone-input" class="profile-label">Phone Number</label>
+                <input type="tel" id="phone-input" placeholder="Enter your phone number">
+            </div>
+            
+            <div class="profile-group">
+                <label for="password-input" class="profile-label">Password</label>
+                <div class="input-icon-wrapper">
+                    <input type="password" id="password-input" placeholder="Enter new password">
+                    <button type="button" class="toggle-password" onclick="togglePassword()">Show</button>
+                </div>
+            </div>
+            
+            <button class="save-btn" id="save-button">Save Changes</button>
+            <button class="cancel-btn" id="cancel-button">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const viewMode = document.getElementById('view-mode');
+        const editMode = document.getElementById('edit-mode');
+        const editButton = document.getElementById('edit-button');
+        const saveButton = document.getElementById('save-button');
+        const cancelButton = document.getElementById('cancel-button');
+        const nameDisplay = document.getElementById('name-display');
+        const phoneDisplay = document.getElementById('phone-display');
+        const nameInput = document.getElementById('name-input');
+        const phoneInput = document.getElementById('phone-input');
+        const passwordInput = document.getElementById('password-input');
+        const successMessage = document.getElementById('success-message');
+
+        // Initial data (would typically come from a database)
+        let userData = {
+            name: "John Doe",
+            phone: "123-456-7890",
+            password: "securePassword123"
+        };
+
+        // Switch to edit mode
+        editButton.addEventListener('click', function() {
+            // Populate form fields with current data
+            nameInput.value = userData.name;
+            phoneInput.value = userData.phone;
+            passwordInput.value = "";  // Don't show actual password for security
+            
+            // Show edit mode, hide view mode
+            viewMode.classList.add('hidden');
+            editMode.classList.remove('hidden');
+        });
+
+        // Save changes
+        saveButton.addEventListener('click', function() {
+            // Update user data
+            userData.name = nameInput.value;
+            userData.phone = phoneInput.value;
+            
+            // Update password only if something was entered
+            if (passwordInput.value.trim() !== '') {
+                userData.password = passwordInput.value;
+            }
+            
+            // Update display
+            nameDisplay.textContent = userData.name;
+            phoneDisplay.textContent = userData.phone;
+            
+            // Show success message
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+            
+            // Switch back to view mode
+            viewMode.classList.remove('hidden');
+            editMode.classList.add('hidden');
+        });
+
+        // Cancel editing
+        cancelButton.addEventListener('click', function() {
+            // Switch back to view mode without saving changes
+            viewMode.classList.remove('hidden');
+            editMode.classList.add('hidden');
+        });
+
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password-input');
+            const toggleButton = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.textContent = 'Show';
+            }
+        }
+    </script>
+</body>
+</html>

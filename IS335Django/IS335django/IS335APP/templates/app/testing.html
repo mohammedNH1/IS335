@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ride Details</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <!-- Leaflet Routing Machine CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
+  <style>
+    :root {
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --background-color: #f9fafb;
+      --card-bg: #ffffff;
+      --text-color: #1f2937;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --pickup-color: #10b981;
+      --dropoff-color: #ef4444;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .back-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .back-btn:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .back-btn:active {
+      transform: translateY(0);
+    }
+    .map-section {
+      margin-bottom: 1.5rem;
+    }
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .details-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .map-container {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      height: 450px;
+      margin-bottom: 1.5rem;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+      padding: 1.5rem;
+    }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    @media (min-width: 768px) {
+      .info-grid.vehicle-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    .info-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .info-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+    .info-value {
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    .driver-info {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .driver-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    .driver-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .driver-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    /* Custom marker styles */
+    .custom-marker {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .pickup-marker {
+      background-color: var(--pickup-color);
+    }
+    .dropoff-marker {
+      background-color: var(--dropoff-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Ride Details</h1>
+      <button class="back-btn" onclick="window.location.href='main.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back to Main
+      </button>
+    </header>
+
+    <div class="map-section">
+      <div class="map-container">
+        <div id="map"></div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Vehicle Details</h2>
+        <div class="info-grid vehicle-grid">
+          <div class="info-item">
+            <span class="info-label">Type</span>
+            <span class="info-value">Sedan</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Make</span>
+            <span class="info-value">Toyota</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Model</span>
+            <span class="info-value">Camry</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Color</span>
+            <span class="info-value">Silver</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Plate Number</span>
+            <span class="info-value">ABC 1234</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="details-grid">
+      <div class="card">
+        <h2 class="card-title">Ride Summary</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Distance</span>
+            <span class="info-value">5.2 miles</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Duration</span>
+            <span class="info-value">18 minutes</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Price</span>
+            <span class="info-value">$24.50</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Date</span>
+            <span class="info-value">Mar 16, 2025</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Driver</h2>
+        <div class="driver-info">
+          <div class="driver-avatar">
+            <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="50" height="50" fill="#e5e7eb" />
+              <circle cx="25" cy="19" r="10" fill="#9ca3af" />
+              <path d="M10 50C10 41.7157 16.7157 35 25 35C33.2843 35 40 41.7157 40 50" fill="#9ca3af" />
+            </svg>
+          </div>
+          <div>
+            <div class="driver-name">Michael Johnson</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <!-- Leaflet Routing Machine JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.js"></script>
+  <script>
+    // Initialize map using Manhattan coordinates
+    const map = L.map('map').setView([40.7580, -73.9855], 14);
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Custom icon creation function
+    function createCustomMarker(className, letter) {
+      return L.divIcon({
+        className: `custom-marker ${className}`,
+        html: `<div>${letter}</div>`,
+        iconSize: [25, 25],
+        iconAnchor: [12.5, 12.5]
+      });
+    }
+
+    // Create custom pickup and dropoff icons
+    const pickupIcon = createCustomMarker('pickup-marker', 'P');
+    const dropoffIcon = createCustomMarker('dropoff-marker', 'D');
+
+    // Define pickup and dropoff locations
+    const pickup = [24.8298, 46.6240]; // Midtown area
+    const dropoff = [24.7238, 46.6157]; // Upper East Side area
+
+    // Optionally add custom markers to the map
+    L.marker(pickup, { icon: pickupIcon }).addTo(map);
+    L.marker(dropoff, { icon: dropoffIcon }).addTo(map);
+
+    // Remove the old hard-coded polyline route by commenting it out or deleting it
+    /*
+    const routePoints = [
+      pickup,
+      [40.7420, -73.9880],
+      [40.7450, -73.9880],
+      [40.7450, -73.9850],
+      [40.7470, -73.9850],
+      [40.7470, -73.9830],
+      [40.7500, -73.9830],
+      [40.7500, -73.9810],
+      [40.7530, -73.9810],
+      [40.7530, -73.9790],
+      [40.7570, -73.9790],
+      [40.7570, -73.9780],
+      [40.7610, -73.9780],
+      [40.7650, -73.9780],
+      dropoff
+    ];
+
+    const route = L.polyline(routePoints, {
+      color: '#6366f1',
+      weight: 5,
+      opacity: 0.8,
+      lineJoin: 'round'
+    }).addTo(map);
+
+    map.fitBounds(route.getBounds(), { padding: [30, 30] });
+    */
+
+    // Add the Leaflet Routing Machine control to generate a real route between pickup and dropoff
+    L.Routing.control({
+  waypoints: [
+    L.latLng(pickup[0], pickup[1]),
+    L.latLng(dropoff[0], dropoff[1])
+  ],
+  container: null,
+  routeWhileDragging: true,
+  addWaypoints: false,
+  createMarker: function(i, wp, nWps) {
+    if (i === 0) {
+      return L.marker(wp.latLng, { icon: pickupIcon }).bindPopup("Pickup");
+    } else if (i === nWps - 1) {
+      return L.marker(wp.latLng, { icon: dropoffIcon }).bindPopup("Dropoff");
+    }
+    return null;
+  },
+  lineOptions: {
+    styles: [{ color: 'blue', weight: 5, opacity: 0.8 }]
+  }
+}).addTo(map);
+
+  </script>
+</body>
+</html>
