@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --background-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --input-focus: #eef2ff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --error-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 2rem 2rem 1.5rem;
+        }
+
+        h2 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        form {
+            padding: 0 2rem 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background-color: var(--card-bg);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--input-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 0.875rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        .register-btn {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            text-align: center;
+            display: block;
+            padding: 0.875rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .register-btn:hover {
+            background-color: rgba(99, 102, 241, 0.05);
+            border-color: var(--primary-color);
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: auto;
+            padding: 0;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 1.5rem;
+        }
+
+        .forgot-password a {
+            color: var(--primary-color);
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: var(--error-color);
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        .remember-me label {
+            margin-bottom: 0;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Welcome back</h2>
+            <p class="subtitle">Sign in to access your account</p>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                <input type="text" id="id_username" name="username" placeholder="Enter your username" required>
+                <p class="error" id="username-error"></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password">Password</label>
+                <div class="input-icon-wrapper">
+                    <input type="password" id="id_password" name="password" placeholder="Enter your password" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword()">Show</button>
+                </div>
+                <p class="error" id="password-error"></p>
+            </div>
+            
+            <div class="remember-me">
+                <input type="checkbox" id="id_remember_me" name="remember_me">
+                <label for="id_remember_me">Remember me</label>
+            </div>
+            
+            <div class="forgot-password">
+                <a href="/forgot-password">Forgot password?</a>
+            </div>
+            
+            <button type="submit" class="submit-btn">Sign In</button>
+            <a href="/register" class="register-btn">Don't have an account? Sign up</a>
+        </form>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('id_password');
+            const toggleButton = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.textContent = 'Show';
+            }
+        }
+    </script>
+</body>
+</html>

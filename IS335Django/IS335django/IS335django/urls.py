@@ -22,5 +22,6 @@ from IS335APP import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("IS335APP.urls")),
+    
 
 ]

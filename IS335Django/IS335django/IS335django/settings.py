@@ -15,7 +15,8 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+GDAL_LIBRARY_PATH = r"C:\Users\v7mv1\OneDrive\Desktop\IS335\IS335Django\venv3.11\Lib\site-packages\osgeo\gdal304.dll"
+GEOS_LIBRARY_PATH = r"C:\Users\v7mv1\OneDrive\Desktop\IS335\IS335Django\venv3.11\Lib\site-packages\osgeo\geos_c.dll"
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -31,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
     'IS335APP',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -76,7 +78,7 @@ WSGI_APPLICATION = 'IS335django.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'IS335',  # Name of your existing database
         'USER': 'postgres',  # PostgreSQL username
         'PASSWORD': 'admin',  # PostgreSQL password

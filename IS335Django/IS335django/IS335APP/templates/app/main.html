@@ -1,8 +1,328 @@
-<html>
-    <head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RideConnect - Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --background-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --input-focus: #eef2ff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --error-color: #ef4444;
+            --secondary-bg: #f3f4f6;
+        }
 
-    </head>
-    <body>
-        tet
-    </body>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--input-focus);
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .user-profile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        .content {
+            padding: 1.5rem 1.5rem 6rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .feature-image {
+            width: 100%;
+            height: 180px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            position: relative;
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+            padding: 1.5rem 1rem 0.75rem;
+        }
+
+        .image-text {
+            color: white;
+            font-weight: 600;
+            font-size: 1.25rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .book-ride-button {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 2rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .book-ride-button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .destinations {
+            margin-top: 2rem;
+        }
+
+        .destination-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .destination-card:hover {
+            border-color: var(--primary-color);
+            background-color: var(--input-focus);
+        }
+
+        .destination-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: var(--secondary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary-color);
+        }
+
+        .destination-info {
+            flex: 1;
+        }
+
+        .destination-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .destination-address {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .destination-arrow {
+            color: var(--text-muted);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 0.75rem 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">RideConnect</div>
+            <div class="user-profile" onclick="goToProfile()">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Cool Feature Image -->
+            <div class="feature-image">
+                <img src="https://i.pinimg.com/736x/79/57/52/79575256d599610295820c0efc41325d.jpg" alt="City transportation">
+                <div class="image-overlay">
+                    <div class="image-text">Your ride is just a tap away</div>
+                </div>
+            </div>
+            
+            <!-- Book a Ride Button -->
+            <button class="book-ride-button" onclick="window.location.href='/bookRide'">Book a Ride</button>
+
+            
+            <!-- Recent Destinations -->
+            <div class="destinations">
+                <h2 class="section-title">Recent destinations</h2>
+                
+                <div class="destination-card">
+                    <div class="destination-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="destination-info">
+                        <div class="destination-name">Work</div>
+                        <div class="destination-address">123 Business Center, Floor 5</div>
+                    </div>
+                    <div class="destination-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                
+                <div class="destination-card">
+                    <div class="destination-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="destination-info">
+                        <div class="destination-name">Home</div>
+                        <div class="destination-address">456 Residential Lane, Apt 7B</div>
+                    </div>
+                    <div class="destination-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                
+                <div class="destination-card">
+                    <div class="destination-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <div class="destination-info">
+                        <div class="destination-name">Gym</div>
+                        <div class="destination-address">789 Fitness Avenue</div>
+                    </div>
+                    <div class="destination-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <div class="nav-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <div>Home</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div>Activity</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div>Explore</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to navigate to profile page
+        function goToProfile() {
+            window.location.href = '/profile';
+        }
+    </script>
+</body>
 </html>
