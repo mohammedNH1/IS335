@@ -96,26 +96,31 @@ def bookRide(request):
 
 from django.shortcuts import render, redirect
 from django.db import connection
-
+from django.utils import timezone
 def rideDetails(request):
     ride_details = request.session.get('ride_details', {})
 
     if not ride_details:
         return render(request, 'error.html', {'message': 'No ride details found.'})
-
+    current_time = timezone.now()
     # Update the ride and driver status when going back to the main menu
     if 'back_to_main' in request.GET:
-        ride_id = ride_details.get('ride_id')  # Assuming ride_id is stored in session data
-        driver_id = ride_details.get('driver_id')  # Assuming driver_id is stored in session data
-
-        # Update the ride status and driver status
+        ride_id = request.session.get('ride_id')  # Assuming ride_id is stored in session data
+        driver_id = request.session.get('driver_id')  # Assuming driver_id is stored in session data
         with connection.cursor() as cursor:
-            cursor.execute("""
-                UPDATE rides SET status = 'completed' WHERE ride_id = %s;
-                UPDATE drivers SET status = 'Available' WHERE driver_id = %s;
-            """, [ride_id, driver_id])
-
-        return redirect('main_menu')  # Replace 'main_menu' with the actual view name for your main menu
+         cursor.execute("""
+        UPDATE rides 
+        SET rides_status = 'completed', end_time = %s 
+        WHERE id = %s;
+        
+        UPDATE driver 
+        SET status = 'Available' 
+        WHERE id = %s;
+         """, [current_time, ride_id, driver_id])
+        # Update the ride status and driver status
+        
+            
+        return redirect('app:main')  # Replace 'main_menu' with the actual view name for your main menu
 
     return render(request, 'app/rideDetails.html', {'ride_details': ride_details})
 
