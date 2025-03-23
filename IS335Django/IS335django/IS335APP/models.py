@@ -72,6 +72,9 @@ class Ride(models.Model):
     def __str__(self):
         return f"Ride {self.id} by Driver {self.driver.id}"
 
+    class Meta():
+        db_table = 'rides'
+
 
 class Offer(models.Model):
     OFFER_STATUS_CHOICES = [
