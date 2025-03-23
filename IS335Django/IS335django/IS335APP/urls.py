@@ -9,4 +9,9 @@ urlpatterns = [
     path("profile/", views.profile , name= "profile"),
     path("bookRide/", views.bookRide, name="bookRide"),
     path("rideDetails/", views.rideDetails, name="rideDetails"),
+    path('api/surge-areas/', views.surge_areas_view, name='surge-areas-api'),
+    path('searchDriver/', views.searchDriver, name='searchDriver'), 
+    path('process_offers/', views.process_offers, name='process_offers'),
+    #path("ride_details/", views.ride_details, name="ride_details"),
+
 ]

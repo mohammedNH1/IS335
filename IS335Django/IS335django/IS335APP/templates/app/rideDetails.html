@@ -154,7 +154,7 @@
       font-size: 1.1rem;
       font-weight: 600;
     }
-    /* Custom marker styles */
+    /* Custom marker styles from your pickup marker example */
     .custom-marker {
       width: 25px;
       height: 25px;
@@ -174,7 +174,7 @@
     .dropoff-marker {
       background-color: var(--dropoff-color);
     }
-    /* Hide the default directions container */
+    /* Optionally hide the default directions container */
     .leaflet-routing-container {
       display: none !important;
     }
@@ -184,7 +184,7 @@
   <div class="container">
     <header>
       <h1>Ride Details</h1>
-      <button class="back-btn" onclick="window.location.href='main.html'">
+      <button class="back-btn" onclick="window.location.href='/main'">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
@@ -202,23 +202,23 @@
         <div class="info-grid vehicle-grid">
           <div class="info-item">
             <span class="info-label">Type</span>
-            <span class="info-value">Sedan</span>
+            <span class="info-value">{{ ride_details.vehicle_type }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Make</span>
-            <span class="info-value">Toyota</span>
+            <span class="info-value">{{ ride_details.make }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Model</span>
-            <span class="info-value">Camry</span>
+            <span class="info-value">{{ ride_details.model }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Color</span>
-            <span class="info-value">Silver</span>
+            <span class="info-value">{{ ride_details.color }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Plate Number</span>
-            <span class="info-value">ABC 1234</span>
+            <span class="info-value">{{ ride_details.plate_number }}</span>
           </div>
         </div>
       </div>
@@ -230,19 +230,19 @@
         <div class="info-grid">
           <div class="info-item">
             <span class="info-label">Distance</span>
-            <span class="info-value">5.2 miles</span>
+            <span class="info-value">{{ ride_details.distance_traveled }} km</span>
           </div>
           <div class="info-item">
             <span class="info-label">Duration</span>
-            <span class="info-value">18 minutes</span>
+            <span class="info-value">{{ ride_details.duration }} minutes</span>
           </div>
           <div class="info-item">
             <span class="info-label">Price</span>
-            <span class="info-value">$24.50</span>
+            <span class="info-value">${{ ride_details.final_price }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Date</span>
-            <span class="info-value">Mar 16, 2025</span>
+            <span class="info-value">{{ ride_details.start_time }}</span>
           </div>
         </div>
       </div>
@@ -251,14 +251,10 @@
         <h2 class="card-title">Driver</h2>
         <div class="driver-info">
           <div class="driver-avatar">
-            <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="50" height="50" fill="#e5e7eb" />
-              <circle cx="25" cy="19" r="10" fill="#9ca3af" />
-              <path d="M10 50C10 41.7157 16.7157 35 25 35C33.2843 35 40 41.7157 40 50" fill="#9ca3af" />
-            </svg>
+            <img src="{{ ride_details.driver_avatar_url }}" alt="Driver Avatar"/>
           </div>
           <div>
-            <div class="driver-name">Michael Johnson</div>
+            <div class="driver-name">{{ ride_details.driver_name }}</div>
           </div>
         </div>
       </div>
@@ -270,15 +266,16 @@
   <!-- Leaflet Routing Machine JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.js"></script>
   <script>
-    // Initialize map using Manhattan coordinates
-    const map = L.map('map').setView([40.7580, -73.9855], 14);
+    const pickup = [{{ ride_details.pickup_lat }}, {{ ride_details.pickup_lng }}]; 
+    const dropoff = [{{ ride_details.dropoff_lat }}, {{ ride_details.dropoff_lng }}];
 
-    // Add OpenStreetMap tile layer
+    const map = L.map('map').setView(pickup, 14);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    // Custom icon creation function
+    // Custom icon creation function using the provided style classes.
     function createCustomMarker(className, letter) {
       return L.divIcon({
         className: `custom-marker ${className}`,
@@ -288,19 +285,15 @@
       });
     }
 
-    // Create custom pickup and dropoff icons
+    // Create pickup and dropoff icons.
     const pickupIcon = createCustomMarker('pickup-marker', 'P');
     const dropoffIcon = createCustomMarker('dropoff-marker', 'D');
 
-    // Define pickup and dropoff locations
-    const pickup = [24.8298, 46.6240]; // Midtown area
-    const dropoff = [24.7238, 46.6157]; // Upper East Side area
-
-    // Optionally add custom markers to the map
+    // Add pickup and dropoff markers to the map.
     L.marker(pickup, { icon: pickupIcon }).addTo(map);
     L.marker(dropoff, { icon: dropoffIcon }).addTo(map);
 
-    // Add the Leaflet Routing Machine control to generate a real route between pickup and dropoff
+    // Set up the routing control (the route remains unchanged).
     L.Routing.control({
       waypoints: [
         L.latLng(pickup[0], pickup[1]),
@@ -319,7 +312,6 @@
       lineOptions: {
         styles: [{ color: 'blue', weight: 5, opacity: 0.8 }]
       }
-      // Note: container option removed to rely on CSS for hiding the itinerary
     }).addTo(map);
   </script>
 </body>

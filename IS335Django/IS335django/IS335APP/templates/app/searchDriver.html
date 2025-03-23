@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ride Details</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <!-- Leaflet Routing Machine CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
+  <style>
+    :root {
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --background-color: #f9fafb;
+      --card-bg: #ffffff;
+      --text-color: #1f2937;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --pickup-color: #10b981;
+      --dropoff-color: #ef4444;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .back-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .back-btn:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .back-btn:active {
+      transform: translateY(0);
+    }
+    .map-section {
+      margin-bottom: 1.5rem;
+    }
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .details-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .map-container {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      height: 450px;
+      margin-bottom: 1.5rem;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+      padding: 1.5rem;
+    }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    @media (min-width: 768px) {
+      .info-grid.vehicle-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    .info-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .info-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+    .info-value {
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    /* Custom marker styles */
+    .custom-marker {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .pickup-marker {
+      background-color: var(--pickup-color);
+    }
+    .dropoff-marker {
+      background-color: var(--dropoff-color);
+    }
+    /* Hide the default directions container */
+    .leaflet-routing-container {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Waiting for Driver</h1>
+      <button class="back-btn" onclick="window.location.href='/main'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back to Main
+      </button>
+    </header>
+
+    <div class="map-section">
+      <div class="map-container">
+        <div id="map"></div>
+      </div>
+    </div>
+
+    <div class="details-grid">
+      <div class="card">
+        <h2 class="card-title">Ride Summary</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Distance</span>
+            <span class="info-value">{{ distance_traveled }} km</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Duration</span>
+            <span class="info-value">{{ duration }} min</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Price</span>
+            <span class="info-value">{{ final_price }} $</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Date</span>
+            <span class="info-value">{{ start_time }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <!-- Leaflet Routing Machine JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.js"></script>
+  <script>
+    // Initialize map using the pickup location as the center.
+    const pickup = [{{ pickup_lat }}, {{ pickup_lng }}];
+    const dropoff = [{{ dropoff_lat }}, {{ dropoff_lng }}];
+    
+    const map = L.map('map').setView(pickup, 14);
+    
+    // Add OpenStreetMap tile layer.
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Custom icon creation function.
+    function createCustomMarker(className, letter) {
+      return L.divIcon({
+        className: `custom-marker ${className}`,
+        html: `<div>${letter}</div>`,
+        iconSize: [25, 25],
+        iconAnchor: [12.5, 12.5]
+      });
+    }
+
+    // Create custom pickup and dropoff icons.
+    const pickupIcon = createCustomMarker('pickup-marker', 'P');
+    const dropoffIcon = createCustomMarker('dropoff-marker', 'D');
+
+    // Add pickup and dropoff markers using the backend coordinates.
+    L.marker(pickup, { icon: pickupIcon }).addTo(map);
+    L.marker(dropoff, { icon: dropoffIcon }).addTo(map);
+
+    // Optionally, display a route between pickup and dropoff.
+    L.Routing.control({
+      waypoints: [
+        L.latLng(pickup[0], pickup[1]),
+        L.latLng(dropoff[0], dropoff[1])
+      ],
+      lineOptions: { styles: [{ color: 'blue', weight: 4 }] },
+      createMarker: function() { return null; }
+    }).addTo(map);
+    
+    // After a timeout of 8 seconds, gather the variables from your template and send them to the backend.
+    setTimeout(function() {
+  // Gather data from Django template variables.
+  const pickupLocation = { lat: {{ pickup_lat|default:"0" }}, lng: {{ pickup_lng|default:"0" }} };
+  const dropoffLocation = { lat: {{ dropoff_lat|default:"0" }}, lng: {{ dropoff_lng|default:"0" }} };
+  const distance = "{{ distance_traveled|default:'' }}";  
+  const duration = "{{ duration|default:'' }}";  
+  const price = "{{ final_price|default:'' }}";  
+  const date = "{{ start_time|default:'' }}";  
+  const route = {{ route_coords|safe }};  // Ensure `route_coords` is a valid JSON object.
+
+  // Send the data to the Django backend.
+  fetch('/process_offers/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      pickup: pickupLocation,
+      dropoff: dropoffLocation,
+      route: route,
+      distance: distance,
+      duration: duration,
+      price: price,
+      date: date
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log("Response from backend:", data);
+    if (data.redirect_url) {
+      window.location.href = data.redirect_url;  // Redirect to the next page
+    } else {
+      console.error("No redirect URL provided.");
+    }
+  })
+  .catch(error => console.error("Error processing offer:", error));
+}, 5000);  // Delay the execution if needed
+
+  </script>
+</body>
+</html>

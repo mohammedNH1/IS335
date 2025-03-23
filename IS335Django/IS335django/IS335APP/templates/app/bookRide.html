@@ -1,393 +1,515 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book a Ride</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f5f5;
-            color: #333;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        .header {
-            padding: 20px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
-        }
-        
-        .content {
-            padding: 20px;
-        }
-        
-        .map-container {
-            height: 200px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #ddd;
-        }
-        
-        #map {
-            height: 100%;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: #000;
-        }
-        
-        /* Vehicle selection styles */
-        .vehicle-options {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .vehicle-option {
-            flex: 1;
-            padding: 15px 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .vehicle-option.selected {
-            border-color: #000;
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-        
-        .vehicle-economy {
-            border-color: #10b981;
-        }
-        
-        .vehicle-family {
-            border-color: #3b82f6;
-        }
-        
-        .vehicle-premium {
-            border-color: #8b5cf6;
-        }
-        
-        .vehicle-icon {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-        
-        .vehicle-name {
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .vehicle-price {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-        }
-        
-        .ride-summary {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-        }
-        
-        .ride-details {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-        
-        .detail {
-            text-align: center;
-        }
-        
-        .detail-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-        
-        .detail-value {
-            font-weight: 600;
-            font-size: 18px;
-        }
-        
-        button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background-color: #000;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        button:hover {
-            background-color: #333;
-        }
-        
-        .map-help {
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-            margin-top: 5px;
-            margin-bottom: 15px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book a Ride</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+  <!-- Leaflet Routing Machine CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+  <!-- Leaflet Routing Machine JS -->
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f5f5;
+      color: #333;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .header {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .content {
+      padding: 20px;
+    }
+    
+    .map-container {
+      height: 200px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #ddd;
+    }
+    
+    #map {
+      height: 100%;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #000;
+    }
+    
+    /* Vehicle selection styles */
+    .vehicle-options {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .vehicle-option {
+      flex: 1;
+      padding: 15px 10px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .vehicle-option.selected {
+      border-color: #000;
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .vehicle-economy {
+      border-color: #10b981;
+    }
+    
+    .vehicle-family {
+      border-color: #3b82f6;
+    }
+    
+    .vehicle-premium {
+      border-color: #8b5cf6;
+    }
+    
+    .vehicle-icon {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    
+    .vehicle-name {
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    .vehicle-price {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+    
+    .ride-summary {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+    
+    .ride-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+    
+    .detail {
+      text-align: center;
+    }
+    
+    .detail-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    
+    .detail-value {
+      font-weight: 600;
+      font-size: 18px;
+    }
+    
+    button {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background-color: #000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    button:hover {
+      background-color: #333;
+    }
+    
+    .map-help {
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+    
+    .surge-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      background-color: #ff5722;
+      color: white;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+    
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100px;
+    }
+    
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid #000;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Book your ride</h1>
-        </div>
-        
-        <div class="content">
-            <div class="map-container">
-                <div id="map"></div>
-            </div>
-            <p class="map-help">Click on the map to set pickup and dropoff locations</p>
-            
-            <div class="form-group">
-                <label for="pickup">Pickup Location</label>
-                <input type="text" id="pickup" readonly placeholder="Click on map to set pickup location">
-            </div>
-            
-            <div class="form-group">
-                <label for="dropoff">Dropoff Location</label>
-                <input type="text" id="dropoff" readonly placeholder="Click on map to set dropoff location">
-            </div>
-            
-            <div class="form-group">
-                <label>Choose Vehicle Type</label>
-                <div class="vehicle-options">
-                    <div class="vehicle-option vehicle-economy selected" onclick="selectVehicle('economy')">
-                        <div class="vehicle-icon">🚗</div>
-                        <div class="vehicle-name">Economy</div>
-                        <div class="vehicle-price"></div>
-                    </div>
-                    <div class="vehicle-option vehicle-premium" onclick="selectVehicle('premium')">
-                        <div class="vehicle-icon">🚙</div>
-                        <div class="vehicle-name">Premium</div>
-                        <div class="vehicle-price">+10%</div>
-                    </div>
-                    <div class="vehicle-option vehicle-family" onclick="selectVehicle('family')">
-                        <div class="vehicle-icon">🚐</div>
-                        <div class="vehicle-name">Family</div>
-                        <div class="vehicle-price">+25%</div>
-                    </div>
-                    
-                </div>
-                <input type="hidden" id="id_vehicle_type" name="vehicle_type" value="economy">
-            </div>
-            
-            <div class="ride-summary">
-                <div class="ride-details">
-                    <div class="detail">
-                        <div class="detail-label">Est. Time</div>
-                        <div class="detail-value" id="estimated-time">--</div>
-                    </div>
-                    <div class="detail">
-                        <div class="detail-label">Est. Price</div>
-                        <div class="detail-value" id="estimated-price">--</div>
-                    </div>
-                </div>
-            </div>
-            
-            <button onclick="calculateRide()">Confirm Ride</button>
-        </div>
+  <div class="container">
+    <div class="header">
+      <h1>Book your ride</h1>
     </div>
+    
+    <div class="content">
+      <div class="map-container">
+        <div id="map"></div>
+      </div>
+      <p class="map-help">Click on the map to set pickup and dropoff locations</p>
+      
+      <div class="form-group">
+        <label for="pickup">Pickup Location</label>
+        <input type="text" id="pickup" readonly placeholder="Click on map to set pickup location">
+      </div>
+      
+      <div class="form-group">
+        <label for="dropoff">Dropoff Location</label>
+        <input type="text" id="dropoff" readonly placeholder="Click on map to set dropoff location">
+      </div>
+      
+      <div class="form-group">
+        <label>Choose Vehicle Type</label>
+        <div class="vehicle-options">
+          <div class="vehicle-option vehicle-economy selected" onclick="selectVehicle('economy')">
+            <div class="vehicle-icon">🚗</div>
+            <div class="vehicle-name">Economy</div>
+            <div class="vehicle-price"></div>
+          </div>
+          <div class="vehicle-option vehicle-premium" onclick="selectVehicle('premium')">
+            <div class="vehicle-icon">🚙</div>
+            <div class="vehicle-name">Premium</div>
+            <div class="vehicle-price">+10%</div>
+          </div>
+          <div class="vehicle-option vehicle-family" onclick="selectVehicle('family')">
+            <div class="vehicle-icon">🚐</div>
+            <div class="vehicle-name">Family</div>
+            <div class="vehicle-price">+25%</div>
+          </div>
+        </div>
+        <input type="hidden" id="id_vehicle_type" name="vehicle_type" value="economy">
+      </div>
+      
+      <div class="ride-summary">
+        <div class="ride-details">
+          <div class="detail">
+            <div class="detail-label">Distance</div>
+            <div class="detail-value" id="estimated-distance">--</div>
+          </div>
+          <div class="detail">
+            <div class="detail-label">Est. Time</div>
+            <div class="detail-value" id="estimated-time">--</div>
+          </div>
+          <div class="detail">
+            <div class="detail-label">Est. Price</div>
+            <div class="detail-value" id="estimated-price">--</div>
+          </div>
+        </div>
+      </div>
+      <form method="POST" action="{% url 'app:searchDriver' %}">
+        {% csrf_token %}
+        <input type="hidden" id="hidden_pickup" name="pickup_location">
+        <input type="hidden" id="hidden_dropoff" name="dropoff_location">
+        <input type="hidden" id="hidden_distance" name="distance">
+        <input type="hidden" id="hidden_duration" name="duration">
+        <input type="hidden" id="hidden_price" name="price">
+        <input type="hidden" id="hidden_vehicle_type" name="vehicle_type" value="economy">
+        <input type="hidden" id="hidden_route" name="route">
+        <button type="submit">Confirm Ride</button>
+      </form>
+    
+      <!-- <button onclick="window.location.href='/rideDetails'">Confirm Ride</button> -->
 
-    <script>
-        // Initialize variables
-        let map;
-        let pickupMarker, dropoffMarker, routeLine;
-        let selectedVehicle = 'economy';
-        
-        // Base prices for vehicle types
-        const vehiclePrices = {
-            economy: { basePrice: 5, pricePerKm: 1.5 },
-            family: { basePrice: 7.5, pricePerKm: 2.2 },
-            premium: { basePrice: 10, pricePerKm: 3.0 }
-        };
-        
-        // Initialize map
-        document.addEventListener('DOMContentLoaded', function() {
-            map = L.map('map').setView([24.7136, 46.6753], 10);
+    </div>
+  </div>
 
-            
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-            
-            // Add click event to the map
-            map.on('click', function(e) {
-                const latlng = e.latlng;
-                
-                if (!pickupMarker) {
-                    // Set pickup location
-                    pickupMarker = L.marker(latlng, {
-                        title: "Pickup Location",
-                        draggable: true,
-                        
-                    }).addTo(map);
-                    
-                    pickupMarker.on('dragend', updateRoute);
-                    document.getElementById('pickup').value = `${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`;
-                } else if (!dropoffMarker) {
-                    // Set dropoff location
-                    dropoffMarker = L.marker(latlng, {
-                        title: "Dropoff Location",
-                        draggable: true
-                    }).addTo(map);
-                    
-                    dropoffMarker.on('dragend', updateRoute);
-                    document.getElementById('dropoff').value = `${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`;
-                    
-                    // Create route line
-                    //drawRoute();
-                } else {
-                    // Reset markers if both already exist
-                    resetMarkers();
-                    
-                    // Set new pickup
-                    pickupMarker = L.marker(latlng, {
-                        title: "Pickup Location",
-                        draggable: true
-                    }).addTo(map);
-                    
-                    pickupMarker.on('dragend', updateRoute);
-                    document.getElementById('pickup').value = `${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`;
-                    document.getElementById('dropoff').value = '';
-                    
-                    // Reset price and time estimates
-                    document.getElementById('estimated-time').textContent = '--';
-                    document.getElementById('estimated-price').textContent = '--';
-                }
+  <script>
+    // Global variables
+    let map;
+    let pickupMarker, dropoffMarker;
+    let routingControl = null;
+    let selectedVehicle = 'economy';
+    let surgeAreas = [];  // Populate with surge data if needed
+
+    // Vehicle types with base fares
+    const vehicleTypes = {
+      economy: { fare: 1 },
+      family: { fare: 1.25 },
+      premium: { fare: 1.1 }
+    };
+
+    // Fetch surge area data (if available)
+    function fetchSurgeAreas() {
+      fetch('http://127.0.0.1:8000/api/surge-areas/')
+        .then(response => response.json())
+        .then(data => {
+          if (Array.isArray(data.surge_areas)) {
+            surgeAreas = data.surge_areas.map(area => {
+              return {
+                location: JSON.parse(area.location), // Parse the location string
+                multiplier: area.multiplier
+              };
             });
+          } else {
+            console.error('surge_areas is not an array:', data.surge_areas);
+          }
+        })
+        .catch(error => console.error('Error fetching surge areas:', error));
+    }
+
+    // Initialize map and event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchSurgeAreas();
+      initMap();
+    });
+
+    function initMap() {
+      map = L.map('map').setView([24.7136, 46.6753], 10);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      // Add click event to map for setting locations
+      map.on('click', function(e) {
+  const latlng = e.latlng;
+  if (!pickupMarker) {
+    // Set pickup location
+    pickupMarker = L.marker(latlng, { title: "Pickup Location", draggable: true }).addTo(map);
+    pickupMarker.on('dragend', updateRoute);
+    document.getElementById('pickup').value = `${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`;
+    document.getElementById('hidden_pickup').value = `${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`; // Add this line
+  } else if (!dropoffMarker) {
+    // Set dropoff location
+    dropoffMarker = L.marker(latlng, { title: "Dropoff Location", draggable: true }).addTo(map);
+    dropoffMarker.on('dragend', updateRoute);
+    document.getElementById('dropoff').value = `${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`;
+    document.getElementById('hidden_dropoff').value = `${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`; // Add this line
+    calculateRide();  // Calculate once both markers are set
+        } else {
+          // Reset markers if both already exist
+          resetMarkers();
+          pickupMarker = L.marker(latlng, { title: "Pickup Location", draggable: true }).addTo(map);
+          pickupMarker.on('dragend', updateRoute);
+          document.getElementById('pickup').value = `${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`;
+          document.getElementById('dropoff').value = '';
+          document.getElementById('estimated-distance').textContent = '--';
+          document.getElementById('estimated-time').textContent = '--';
+          document.getElementById('estimated-price').textContent = '--';
+        }
+      });
+    }
+
+    // Calculate ride using Leaflet Routing Machine
+    function calculateRide() {
+      if (!pickupMarker || !dropoffMarker) return;
+      drawRoute();
+    }
+
+    // Draw route using Leaflet Routing Machine and update ride summary
+    function drawRoute() {
+    if (pickupMarker && dropoffMarker) {
+        // Remove previous route if exists
+        if (routingControl) {
+            map.removeControl(routingControl);
+        }
+        
+        // Create the routing control with blue route
+        routingControl = L.Routing.control({
+            waypoints: [
+                pickupMarker.getLatLng(),
+                dropoffMarker.getLatLng()
+            ],
+            routeWhileDragging: true,
+            show: true,
+            createMarker: function() { return null; } ,
+            routeWhileDragging: false,
+            addWaypoints: false,
+            draggableWaypoints: false,
+            fitSelectedRoutes: true,
+            show: false,  // Hide the routing UI
+            lineOptions: {
+                styles: [
+                    {
+                        color: 'blue',  // Blue color for the route
+                        weight: 5,      // Line thickness (optional)
+                        opacity: 0.7    // Line opacity (optional)
+                    }
+                ]
+            }
+        }).addTo(map);
+
+        routingControl.on('routesfound', function(e) {
+            let route = e.routes[0];
+            // Route summary values: totalDistance (meters) and totalTime (seconds)
+            let distanceInKm = route.summary.totalDistance / 1000;
+            let timeInMins = route.summary.totalTime / 60;
+
+            // Calculate ride price using vehicle base fare, per km and per minute fares
+            const baseFare = vehicleTypes[selectedVehicle].fare;
+            let totalFare = (timeInMins + distanceInKm) / 2 * baseFare;
+
+            // Optionally apply surge pricing
+            const surgeMultiplier = getSurgeMultiplier(pickupMarker.getLatLng());
+            totalFare *= surgeMultiplier;
+
+            // Update ride summary UI
+            const routeCoordinates = route.coordinates.map(coord => [coord.lat, coord.lng]);
+  
+  // Update hidden route input
+            document.getElementById('hidden_route').value = JSON.stringify(routeCoordinates);
+                document.getElementById('estimated-distance').textContent = `${distanceInKm.toFixed(2)} km`;
+                document.getElementById('estimated-time').textContent = `${timeInMins.toFixed(2)} mins`;
+                document.getElementById('estimated-price').textContent = `$${totalFare.toFixed(2)}`;
+
+                  // Update hidden inputs
+                document.getElementById('hidden_distance').value = distanceInKm.toFixed(2);
+                document.getElementById('hidden_duration').value = timeInMins.toFixed(2);
+                document.getElementById('hidden_price').value = totalFare.toFixed(2);
         });
-        
-        function resetMarkers() {
-            if (pickupMarker) map.removeLayer(pickupMarker);
-            if (dropoffMarker) map.removeLayer(dropoffMarker);
-            if (routeLine) map.removeLayer(routeLine);
-            
-            pickupMarker = null;
-            dropoffMarker = null;
-            routeLine = null;
+    }
+}
+
+
+    // Optionally: remove manual distance calculation function if not needed anymore.
+    // function getDistance(latlng1, latlng2) { ... }
+
+    // Get surge multiplier based on pickup location
+    function getSurgeMultiplier(latlng) {
+      for (let area of surgeAreas) {
+        if (isPointInGeoJSONPolygon(latlng, area.location)) {
+          return area.multiplier;
         }
-        
-        // function drawRoute() {
-        //     if (pickupMarker && dropoffMarker) {
-        //         if (routeLine) map.removeLayer(routeLine);
-                
-        //         routeLine = L.polyline([
-        //             pickupMarker.getLatLng(),
-        //             dropoffMarker.getLatLng()
-        //         ], {
-        //             color: 'blue',
-        //             weight: 4,
-        //             opacity: 0.7
-        //         }).addTo(map);
-                
-        //         // Fit the map to show both markers
-        //         let bounds = L.latLngBounds(pickupMarker.getLatLng(), dropoffMarker.getLatLng());
-        //         map.fitBounds(bounds, { padding: [50, 50] });
-        //     }
-        // }
-        
-        function updateRoute() {
-            if (pickupMarker && dropoffMarker) {
-                document.getElementById('pickup').value = `${pickupMarker.getLatLng().lat.toFixed(6)}, ${pickupMarker.getLatLng().lng.toFixed(6)}`;
-                document.getElementById('dropoff').value = `${dropoffMarker.getLatLng().lat.toFixed(6)}, ${dropoffMarker.getLatLng().lng.toFixed(6)}`;
-                //drawRoute();
-            }
-        }
-        
-        function selectVehicle(type) {
-            selectedVehicle = type;
-            document.getElementById('id_vehicle_type').value = type;
-            
-            // Update UI
-            document.querySelectorAll('.vehicle-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            document.querySelector(`.vehicle-${type}`).classList.add('selected');
-            
-            // Recalculate if we have both markers
-            if (pickupMarker && dropoffMarker) {
-                calculateRide();
-            }
-        }
-        
-        function calculateRide() {
-            if (!pickupMarker || !dropoffMarker) {
-                alert("Please select both pickup and dropoff locations on the map.");
-                return;
-            }
-            
-            // Calculate distance in km
-            const pickup = pickupMarker.getLatLng();
-            const dropoff = dropoffMarker.getLatLng();
-            const distance = pickup.distanceTo(dropoff) / 1000; // Convert to km
-            
-            // Calculate estimated time (assuming 30 km/h average speed)
-            const timeInMinutes = Math.round(distance * 2); // Simple calculation for demo
-            
-            // Calculate price based on vehicle type and distance
-            const pricing = vehiclePrices[selectedVehicle];
-            const price = pricing.basePrice + (distance * pricing.pricePerKm);
-            
-            // Update UI
-            document.getElementById('estimated-time').textContent = `${timeInMinutes} min`;
-            document.getElementById('estimated-price').textContent = `$${price.toFixed(2)}`;
-        }
-    </script>
+      }
+      return 1;
+    }
+
+    // Simple ray-casting algorithm to check if a point is inside a polygon
+    function isPointInGeoJSONPolygon(point, polygon) {
+      const coords = polygon.coordinates[0];
+      let inside = false;
+      for (let i = 0, j = coords.length - 1; i < coords.length; j = i++) {
+        const xi = coords[i][0], yi = coords[i][1];
+        const xj = coords[j][0], yj = coords[j][1];
+        const intersect = ((yi > point.lat) !== (yj > point.lat)) &&
+                          (point.lng < (xj - xi) * (point.lat - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+      }
+      return inside;
+    }
+
+    // Update route when markers are dragged
+    function updateRoute() {
+      if (pickupMarker && dropoffMarker) {
+        document.getElementById('pickup').value = `${pickupMarker.getLatLng().lat.toFixed(6)}, ${pickupMarker.getLatLng().lng.toFixed(6)}`;
+        document.getElementById('dropoff').value = `${dropoffMarker.getLatLng().lat.toFixed(6)}, ${dropoffMarker.getLatLng().lng.toFixed(6)}`;
+        drawRoute();
+        routingControl.setWaypoints([
+      pickupMarker.getLatLng(),
+      dropoffMarker.getLatLng()
+    ]);
+    routingControl.route();
+      }
+    }
+
+    // Reset markers and route
+    function resetMarkers() {
+      if (pickupMarker) map.removeLayer(pickupMarker);
+      if (dropoffMarker) map.removeLayer(dropoffMarker);
+      if (routingControl) map.removeControl(routingControl);
+      pickupMarker = null;
+      dropoffMarker = null;
+      routingControl = null;
+    }
+
+    // Select vehicle type and recalculate ride if markers exist
+    function selectVehicle(type) {
+  selectedVehicle = type;
+  document.getElementById('id_vehicle_type').value = type;
+  document.getElementById('hidden_vehicle_type').value = type; // Add this line
+  
+  document.querySelectorAll('.vehicle-option').forEach(option => {
+    option.classList.remove('selected');
+  });
+  document.querySelector(`.vehicle-${type}`).classList.add('selected');
+  
+  if (pickupMarker && dropoffMarker) {
+    calculateRide();
+  }
+}
+  </script>
 </body>
 </html>
