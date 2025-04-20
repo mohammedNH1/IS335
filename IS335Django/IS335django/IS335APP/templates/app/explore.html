@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RideConnect - Explore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css"/>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --background-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --input-focus: #eef2ff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --error-color: #ef4444;
+            --secondary-bg: #f3f4f6;
+            --surge-low: rgba(34, 197, 94, 0.5);    /* Green */
+            --surge-medium: rgba(234, 179, 8, 0.5);  /* Yellow */
+            --surge-high: rgba(244, 63, 94, 0.5);     /* Red */
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        body, html {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+        .app-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow-md);
+        }
+        .sidebar {
+            width: 350px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+        .back-button, .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--input-focus);
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .back-button:hover, .user-profile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+        }
+        .sidebar-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        .destination-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .destination-card:hover {
+            border-color: var(--primary-color);
+            background-color: var(--input-focus);
+        }
+        .destination-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: var(--secondary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary-color);
+        }
+        .destination-info {
+            flex: 1;
+        }
+        .destination-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        .destination-address {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .map-container {
+            flex-grow: 1;
+            position: relative;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .surge-legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255,255,255,0.8);
+            border-radius: 8px;
+            padding: 10px;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 4px;
+        }
+    </style>
+    <script>
+        // Optionally, if you pass data from Django via context:
+        const surgeAreasData1 = {
+            surge_areas: JSON.parse('{{ surge_areas_json|escapejs }}')
+        };
+    </script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="header">
+                <div class="logo">RideConnect</div>
+                <div class="back-button" onclick="goToMain()">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+                <div class="user-profile" onclick="goToProfile()">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+            <!-- Sidebar Content - Updated with dynamic ID -->
+            <div class="sidebar-content" id="surge-areas-list">
+                <h2 style="margin-bottom: 1rem; font-size: 1.25rem; color: var(--text-color);">Surge Areas</h2>
+                <!-- Cards will be dynamically inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="map-container">
+            <div id="map"></div>
+            <!-- Surge Legend -->
+            <div class="surge-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--surge-low)"></div>
+                    <span>Low Surge (≤1.5x)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--surge-medium)"></div>
+                    <span>Medium Surge (1.5-2x)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: var(--surge-high)"></div>
+                    <span>High Surge (>2x)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the map centered on Riyadh
+        var map = L.map('map').setView([24.7136, 46.6753], 10);
+    
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+    
+        // Function to get color based on surge multiplier
+        function getSurgeColor(multiplier) {
+            if (multiplier <= 1.5) return 'var(--surge-low)';
+            if (multiplier <= 2.0) return 'var(--surge-medium)';
+            return 'var(--surge-high)';
+        }
+    
+        // Function to get surge level label
+        function getSurgeLabel(multiplier) {
+            if (multiplier <= 1.5) return 'Low Surge';
+            if (multiplier <= 2.0) return 'Medium Surge';
+            return 'High Surge';
+        }
+    
+        let surgeAreas = [];
+    
+        function fetchSurgeAreas() {
+            fetch('http://127.0.0.1:8000/api/surge-areas-explore/')
+                .then(response => response.json())
+                .then(data => {
+                    if (Array.isArray(data.surge_areas)) {
+                        surgeAreas = data.surge_areas.map(area => ({
+                            name: area.name,
+                            location: area.location, 
+                            multiplier: area.multiplier
+                        }));
+                        console.log("Surge areas updated:", surgeAreas);
+                        displaySurgeAreas({ surge_areas: surgeAreas });
+                    } else {
+                        console.error('surge_areas is not an array:', data.surge_areas);
+                    }
+                })
+                .catch(error => console.error('Error fetching surge areas:', error));
+        }
+    
+        // Process and display surge areas
+        function displaySurgeAreas(data) {
+            const surgeAreasList = document.getElementById('surge-areas-list');
+            
+            // Clear existing content (except the header)
+            while (surgeAreasList.children.length > 1) {
+                surgeAreasList.removeChild(surgeAreasList.lastChild);
+            }
+    
+            // Process and display surge areas
+            data.surge_areas.forEach((area, index) => {
+                try {
+                    const geometry = JSON.parse(area.location);
+                    const coordinates = geometry.coordinates[0].map(coord => [coord[1], coord[0]]); // Convert to [lat, lng]
+                    const color = getSurgeColor(area.multiplier);
+                    const label = getSurgeLabel(area.multiplier);
+                    const areaName = area.name || `Surge Area ${index + 1}`;
+    
+                    // Add polygon to map
+                    const polygon = L.polygon(coordinates, {
+                        color: color,
+                        fillColor: color,
+                        fillOpacity: 0.5,
+                        weight: 2
+                    }).addTo(map);
+    
+                    // Create sidebar card
+                    const card = document.createElement('div');
+                    card.className = 'destination-card';
+                    card.innerHTML = `
+                        <div class="destination-icon" style="background-color: ${color}">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="destination-info">
+                            <div class="destination-name">${areaName}</div>
+                            <div class="destination-address">${label} (${area.multiplier}x)</div>
+                        </div>
+                    `;
+                    
+                    // Add click event to zoom to area
+                    card.addEventListener('click', () => {
+                        map.fitBounds(polygon.getBounds());
+                    });
+                    
+                    // Add to sidebar
+                    surgeAreasList.appendChild(card);
+    
+                    // Add popup to map polygon
+                    polygon.bindPopup(`
+                        <strong>${areaName}</strong><br>
+                        ${label} (${area.multiplier}x multiplier)
+                    `);
+                } catch (e) {
+                    console.error('Error processing surge area:', area, e);
+                }
+            });
+        }
+    
+        // Fetch surge areas from the new API endpoint
+        fetchSurgeAreas();
+    
+        function goToProfile() {
+            window.location.href = '/profile';
+        }
+        function goToMain() {
+            window.location.href = '/main';
+        }
+    </script>
+</body>
+</html>

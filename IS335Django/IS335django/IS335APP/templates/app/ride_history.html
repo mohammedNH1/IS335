@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RideConnect - Home</title>
+    <title>RideConnect - Activity</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -90,63 +90,7 @@
             color: var(--text-color);
         }
 
-        .feature-image {
-            width: 100%;
-            height: 180px;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-            position: relative;
-            box-shadow: var(--shadow-md);
-        }
-
-        .feature-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .image-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
-            padding: 1.5rem 1rem 0.75rem;
-        }
-
-        .image-text {
-            color: white;
-            font-weight: 600;
-            font-size: 1.25rem;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        .book-ride-button {
-            display: block;
-            width: 100%;
-            padding: 1rem;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            margin-bottom: 2rem;
-            transition: background-color 0.2s ease;
-        }
-
-        .book-ride-button:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .destinations {
-            margin-top: 2rem;
-        }
-
-        .destination-card {
+        .ride-card {
             display: flex;
             align-items: center;
             padding: 1rem;
@@ -157,12 +101,12 @@
             transition: all 0.2s ease;
         }
 
-        .destination-card:hover {
+        .ride-card:hover {
             border-color: var(--primary-color);
             background-color: var(--input-focus);
         }
 
-        .destination-icon {
+        .ride-icon {
             width: 40px;
             height: 40px;
             border-radius: 8px;
@@ -174,22 +118,29 @@
             color: var(--primary-color);
         }
 
-        .destination-info {
+        .ride-info {
             flex: 1;
         }
 
-        .destination-name {
+        .ride-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ride-name {
             font-weight: 500;
             margin-bottom: 0.25rem;
         }
 
-        .destination-address {
+        .ride-date {
             font-size: 0.75rem;
             color: var(--text-muted);
         }
 
-        .destination-arrow {
-            color: var(--text-muted);
+        .ride-price {
+            font-weight: 600;
+            color: var(--text-color);
         }
 
         .bottom-nav {
@@ -224,6 +175,18 @@
             font-size: 1.25rem;
             margin-bottom: 0.25rem;
         }
+
+        .no-rides {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 2rem 1rem;
+        }
+
+        .error-message {
+            text-align: center;
+            color: var(--error-color);
+            padding: 2rem 1rem;
+        }
     </style>
 </head>
 <body>
@@ -238,76 +201,51 @@
         
         <!-- Main Content -->
         <div class="content">
-            <!-- Cool Feature Image -->
-            <div class="feature-image">
-                <img src="https://i.pinimg.com/736x/79/57/52/79575256d599610295820c0efc41325d.jpg" alt="City transportation">
-                <div class="image-overlay">
-                    <div class="image-text">Your ride is just a tap away</div>
-                </div>
-            </div>
+            <h2 class="section-title">Ride History</h2>
             
-            <!-- Book a Ride Button -->
-            <button class="book-ride-button" onclick="window.location.href='/bookRide'">Book a Ride</button>
+            <div id="ridesList">
+                {% if user_rides %}
+                    {% for ride in user_rides %}
+                    <div class="ride-card" onclick="viewRideDetails('{{ ride.ride_id }}')">
+                        <div class="ride-icon">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="ride-info">
+                            <div class="ride-details">
+                                <div>
+                                    <div class="ride-date">{{ ride.start_time }}</div>
+                                </div>
+                                <div class="ride-price">${{ ride.final_price|floatformat:2 }}</div>
+                            </div>
+                            <div class="ride-status">{{ ride.status }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-rides">
+                        <p>{{ message|default:"No ride history found" }}</p>
+                    </div>
+                {% endif %}
+            </div>
 
-            
-            <!-- Recent Destinations -->
-            <div class="destinations">
-                <h2 class="section-title">Services</h2>
-                
-                <div class="destination-card" onclick="goToHistory()">
-                    <div class="destination-icon">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <div class="destination-info" >
-                        <div class="destination-name" >View my past rides</div>
-                    </div>
-                    <div class="destination-arrow">
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </div>
-                
-                <div class="destination-card" onclick="goToExplore()">
-                    <div class="destination-icon">
-                        <i class="fas fa-home"></i>
-                    </div>
-                    <div class="destination-info">
-                        <div class="destination-name">Explore the map</div>
-                    </div>
-                    <div class="destination-arrow">
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </div>
-                
-                <div class="destination-card" onclick="goToProfile()">
-                    <div class="destination-icon">
-                        <i class="fas fa-dumbbell"></i>
-                    </div>
-                    <div class="destination-info">
-                        <div class="destination-name">Change account details</div>
-                    </div>
-                    <div class="destination-arrow">
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </div>
-            </div>
         </div>
         
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
-            <div class="nav-item active">
+            <div class="nav-item" onclick="goToMain()">
                 <div class="nav-icon">
                     <i class="fas fa-home"></i>
                 </div>
                 <div>Home</div>
             </div>
-            <div class="nav-item">
-                <div class="nav-icon" onclick="goToHistory()">
+            <div class="nav-item active">
+                <div class="nav-icon">
                     <i class="fas fa-clock"></i>
                 </div>
                 <div>Activity</div>
             </div>
-            <div class="nav-item">
-                <div class="nav-icon" onclick="goToExplore()">
+            <div class="nav-item" onclick="goToExplore()">
+                <div class="nav-icon">
                     <i class="fas fa-map-marker-alt"></i>
                 </div>
                 <div>Explore</div>
@@ -321,13 +259,19 @@
             window.location.href = '/profile';
         }
 
-        function goToHistory() {
-            window.location.href = '/ride_history';
+        function goToMain() {
+            window.location.href = '/main';
         }
 
         function goToExplore() {
             window.location.href = '/explore';
         }
+
+        // Function to view ride details
+        function viewRideDetails(rideId) {
+            window.location.href = `/ride-details/${rideId}`;
+        }
+
     </script>
 </body>
 </html>
