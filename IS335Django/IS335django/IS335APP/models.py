@@ -26,7 +26,7 @@ class Rider(models.Model):
     id = models.CharField(max_length=255, primary_key=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     contact_details = models.CharField(max_length=255)
-    location = gis_models.PointField(srid=4326)  # Use SRID 4326 for WGS84 coordinate system
+    #location = gis_models.PointField(srid=4326)  # Use SRID 4326 for WGS84 coordinate system
     password = models.CharField(max_length=255)
 
     class Meta:
